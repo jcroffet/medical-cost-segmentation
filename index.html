@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where to spend the health intervention budget — medical cost segmentation</title>
+<meta name="description" content="A segmentation analysis of 1,337 medical cost records identifying which member segment to target for health interventions, and how much the targeting is worth.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Medical cost segmentation &middot; intervention targeting</p>
+    <h1>The most expensive segment in the book is also the smallest</h1>
+    <p class="standfirst">
+      Smoking and obesity do not add together — they multiply. The 145 members who carry both
+      risk factors are 11% of this book and 34% of its spend. This analysis sizes that segment,
+      tests whether the effect is real, and ranks five candidate interventions against it.
+    </p>
+    <div class="byline">
+      <span>Joshua Croffet</span>
+      <span>1,337 members analysed</span>
+      <span>$17.75M total spend</span>
+    </div>
+    <div class="provenance">
+      <strong>Read this first.</strong> The source file is the widely circulated
+      <em>Medical Cost Personal Datasets</em> teaching set, which is simulated rather than drawn
+      from real claims. Findings below are real properties of the data and the methods are the
+      ones I would use on a live book, but no conclusion here describes an actual insurer.
+      One finding — the BMI 30 discontinuity — is almost certainly an artifact of how the file
+      was generated, and is reported as such rather than quietly dropped.
+    </div>
+  </div>
+</header>
+
+<div class="grid-section">
+  <div class="wrap">
+    <p class="eyebrow">The underwriting grid</p>
+    <h2>Mean annual cost per member, by risk factor</h2>
+
+    <div class="riskgrid" role="group" aria-label="Mean annual cost by smoking status and BMI band">
+      <div class="axis-label"></div>
+      <div class="axis-label">BMI under 30</div>
+      <div class="axis-label">BMI 30 and over</div>
+
+      <div class="axis-label vert">Non-smoker</div>
+      <button class="cell t1" aria-pressed="false" data-seg="Non-smoker, BMI &lt;30">
+        <span class="cost-label">Non-smoker, BMI &lt;30</span>
+        <span class="cost">$7,977</span>
+        <span class="meta">502 members &middot; 23% of spend</span>
+      </button>
+      <button class="cell t2" aria-pressed="false" data-seg="Non-smoker, BMI 30+">
+        <span class="cost-label">Non-smoker, BMI 30+</span>
+        <span class="cost">$8,856</span>
+        <span class="meta">561 members &middot; 28% of spend</span>
+      </button>
+
+      <div class="axis-label vert">Smoker</div>
+      <button class="cell t3" aria-pressed="false" data-seg="Smoker, BMI &lt;30">
+        <span class="cost-label">Smoker, BMI &lt;30</span>
+        <span class="cost">$21,363</span>
+        <span class="meta">129 members &middot; 16% of spend</span>
+      </button>
+      <button class="cell t4" aria-pressed="false" data-seg="Smoker, BMI 30+">
+        <span class="cost-label">Smoker, BMI 30+</span>
+        <span class="cost">$41,558</span>
+        <span class="meta">145 members &middot; 34% of spend</span>
+      </button>
+    </div>
+
+    <div class="multiplier">
+      <span class="big">&times;23</span>
+      <p>
+        Obesity costs a non-smoker <strong>$879</strong> a year. It costs a smoker
+        <strong>$20,195</strong>. Neither risk factor alone tells you where to intervene —
+        the intersection does.
+      </p>
+    </div>
+
+    <p id="cellDetail">Select any cell for the segment detail.</p>
+
+    <div class="metrics">
+      <div class="metric">
+        <span class="label">Members analysed</span>
+        <span class="value">1,337</span>
+        <span class="note">1 duplicate removed</span>
+      </div>
+      <div class="metric">
+        <span class="label">Median charge</span>
+        <span class="value">$9,382</span>
+        <span class="note">mean $13,270 — skew 1.52</span>
+      </div>
+      <div class="metric">
+        <span class="label">Top 20% of members</span>
+        <span class="value">51.6%</span>
+        <span class="note">of all spend</span>
+      </div>
+      <div class="metric">
+        <span class="label">Best lever, at 10% uptake</span>
+        <span class="value">$474k</span>
+        <span class="note">2.7% of the book</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="findings">
+  <div class="wrap">
+    <p class="eyebrow">What the data says</p>
+    <h2>Six findings</h2>
+
+    <div class="findings">
+      <article class="finding">
+        <h3>Smoking and obesity multiply rather than add</h3>
+        <p>Being obese costs a non-smoker $879 a year. It costs a smoker $20,195 — a 23-fold
+        difference in the same risk factor. The 145 members carrying both spend $6.03M of the
+        book's $17.75M.</p>
+      </article>
+
+      <article class="finding caution">
+        <h3>But the BMI 30 threshold is an artifact, and it should be said out loud</h3>
+        <p>Within smokers below BMI 30, each additional BMI point adds about $491. Above 30, about
+        $545. The gradient barely changes — yet the step at the boundary itself is $20,195.</p>
+        <p>Real physiology does not produce a $20,000 cliff at exactly 30.0. A simulation rule does.
+        So "move members from BMI 31 to 29" is <strong>not</strong> a defensible recommendation from
+        this file, and any intervention priced on that threshold is priced on a generator quirk.</p>
+      </article>
+
+      <article class="finding">
+        <h3>Age is a false lead</h3>
+        <p>The intuition is that smoking gets more expensive as members age, so target older smokers.
+        It does not hold here. The smoker-to-non-smoker gap runs $23,091 at 18–29, $23,934 at 30–39,
+        $23,471 at 40–49 and $25,317 at 50–64 — essentially flat.</p>
+        <p>That inverts the recommendation. If the annual gap is the same at every age, the young
+        cohort is worth more in total, because there are more years left for the saving to repeat.</p>
+      </article>
+
+      <article class="finding">
+        <h3>The largest population is the worst target</h3>
+        <p>Obese non-smokers are 561 members — 42% of the book. The entire theoretical prize from
+        moving all of them below BMI 30 is $493k, or $879 a head. This is exactly where a
+        general "tackle obesity" programme would spend its budget, and it is the lowest-yield
+        option on the table.</p>
+      </article>
+
+      <article class="finding">
+        <h3>Geography concentrates the problem</h3>
+        <p>The southeast has 15.9% obese smokers against 8.9% across the other three regions, and
+        that single segment accounts for 45.7% of all southeast spend. It is not a separate lever —
+        it is where the cessation levers get run first.</p>
+      </article>
+
+      <article class="finding">
+        <h3>A quarter of the variance is not in the file</h3>
+        <p>A linear model on all six inputs reaches R² = 0.75. The residual is not noise: 80 members
+        sit more than $10,000 above prediction, including 10 non-smokers billing over $30,000 with
+        otherwise unremarkable profiles. Something not captured here — diagnosis, claims history, a
+        catastrophic event — is driving them. That is a data collection finding, not an analytical
+        failure.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="charts">
+  <div class="wrap">
+    <p class="eyebrow">Evidence</p>
+    <h2>Three charts that carry the argument</h2>
+
+    <div class="chartbox">
+      <div class="legend">
+        <span><i class="swatch" style="background:#8494a0"></i>Share of members</span>
+        <span><i class="swatch" style="background:#a63a4a"></i>Share of spend</span>
+      </div>
+      <div class="canvas-hold">
+        <canvas id="segChart" role="img" aria-label="Horizontal bar chart. Smokers with BMI 30 or over are 10.8 percent of members but 33.9 percent of spend. Non-smokers with BMI 30 or over are 42.0 percent of members and 28.0 percent of spend. Non-smokers under BMI 30 are 37.5 percent of members and 22.6 percent of spend. Smokers under BMI 30 are 9.6 percent of members and 15.5 percent of spend."></canvas>
+      </div>
+      <p class="cap">Population and cost are inverted. Only the obese-smoker segment consumes far
+      more than its share; every other segment consumes less than or close to its own.</p>
+    </div>
+
+    <div class="chartbox">
+      <div class="legend">
+        <span><i class="swatch" style="background:#8494a0"></i>Non-smoker</span>
+        <span><i class="swatch" style="background:#a63a4a"></i>Smoker</span>
+      </div>
+      <div class="canvas-hold">
+        <canvas id="bmiChart" role="img" aria-label="Grouped bar chart of mean annual charges by BMI band. Non-smokers stay near 8,000 dollars across every band. Smokers rise from about 19,800 dollars under BMI 25 and 22,500 dollars at BMI 25 to 30, then jump to 39,600 dollars at BMI 30 to 35, 42,800 at 35 to 40, and 45,500 above 40."></canvas>
+      </div>
+      <p class="cap">The smoker series is flat within each side of the BMI 30 boundary and jumps
+      across it. A biological dose-response would rise smoothly. This is the discontinuity that
+      marks the dataset as simulated.</p>
+    </div>
+
+    <div class="chartbox">
+      <div class="legend">
+        <span><i class="swatch" style="background:#8494a0"></i>Non-smoker</span>
+        <span><i class="swatch" style="background:#a63a4a"></i>Smoker</span>
+      </div>
+      <div class="canvas-hold">
+        <canvas id="ageChart" role="img" aria-label="Line chart of mean annual charges across four age bands. Non-smoker costs rise from about 4,400 dollars at ages 18 to 29 up to 13,400 dollars at 50 to 64. Smoker costs rise from 27,500 to 38,700 dollars. The gap between the two lines stays between 23,091 and 25,317 dollars across all four bands."></canvas>
+      </div>
+      <p class="cap">Both lines rise with age, but the distance between them barely moves. The
+      smoking penalty is close to constant across the whole age range.</p>
+    </div>
+  </div>
+</section>
+
+<section id="priorities">
+  <div class="wrap">
+    <p class="eyebrow">The recommendation</p>
+    <h2>Five levers, ranked</h2>
+    <p class="prose">
+      Scored on impact &times; confidence &divide; effort. The ceiling column assumes every member in
+      the segment converts and carries no residual risk — an upper bound, not a forecast. The
+      10% column is the number I would take into a business case: generous but defensible for
+      cessation programmes, optimistic for weight programmes.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <caption>Association-based sizing. These are not causal effects — see limitations.</caption>
+        <thead>
+          <tr>
+            <th>Rank</th><th>Lever</th><th class="n">Members</th><th class="n">Ceiling</th>
+            <th class="n">At 10% uptake</th><th>Confidence</th><th>Effort</th>
+          </tr>
+        </thead>
+        <tbody id="leverBody"></tbody>
+      </table>
+    </div>
+
+    <p class="prose" style="margin-top:2rem">
+      <strong>The headline:</strong> target 11% of members and you are addressing 34% of spend.
+      The highest-yield intervention available points at the smallest segment in the book, not the
+      largest — which is the opposite of how a wellness budget is usually allocated.
+    </p>
+  </div>
+</section>
+
+<section id="questions">
+  <div class="wrap">
+    <p class="eyebrow">What I would ask next</p>
+    <h2>Ten questions this file cannot answer</h2>
+    <p class="prose">
+      The dataset has no time dimension: one row per member, one aggregate charge, no dates, no
+      member ID, no claim detail. Every question below carries a metric, a window and the decision
+      it would settle — and most of them need data this file does not contain. Listing them is the
+      point. Knowing which question your data cannot answer is worth more than another chart of
+      the question it can.
+    </p>
+    <div class="questions" id="questionList"></div>
+  </div>
+</section>
+
+<section id="limitations">
+  <div class="wrap">
+    <p class="eyebrow">Where this breaks</p>
+    <h2>Limitations</h2>
+    <ul class="plain">
+      <li><strong>The data is simulated.</strong> It is a teaching dataset, not a real book of
+      business. No conclusion here describes an actual insurer or population.</li>
+      <li><strong>No causality is established.</strong> There is no time dimension, so nothing here
+      can show that quitting <em>causes</em> a cost reduction. Every saving figure is an
+      association-based ceiling.</li>
+      <li><strong>The BMI 30 effect is almost certainly a generator artifact</strong>, and any lever
+      that depends on it is scored low-confidence for that reason.</li>
+      <li><strong>Smoking status is self-reported and binary.</strong> No intensity, no former-smoker
+      category. Self-reported tobacco use is systematically under-declared in insurance settings.</li>
+      <li><strong>Ages 18 and 19 are over-sampled</strong> — 69 and 68 records against a flat ~28 for
+      every other age. Unweighted age trends inherit that bias.</li>
+      <li><strong>Small cells are directional only.</strong> Members with four or five children
+      (n=25 and n=18) are reported but not used to support any recommendation.</li>
+      <li><strong>Charges are in an unstated price year</strong> and cannot be inflation-adjusted or
+      benchmarked against external cost data.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="downloads">
+  <div class="wrap">
+    <p class="eyebrow">Supporting material</p>
+    <h2>Reports, data and code</h2>
+    <div class="downloads">
+      <a class="dl" href="assets/reports/executive-summary.pdf">
+        <span class="kind">PDF &middot; report</span>
+        <span class="name">Executive summary — where to spend the intervention budget</span>
+      </a>
+      <a class="dl" href="assets/reports/segmentation-and-sizing.pdf">
+        <span class="kind">PDF &middot; report</span>
+        <span class="name">Segmentation and intervention sizing</span>
+      </a>
+      <a class="dl" href="assets/reports/data-quality-and-artifacts.pdf">
+        <span class="kind">PDF &middot; report</span>
+        <span class="name">Data quality and the BMI 30 artifact</span>
+      </a>
+      <a class="dl" href="data/insurance.csv">
+        <span class="kind">CSV &middot; source data</span>
+        <span class="name">insurance.csv — 1,338 raw records</span>
+      </a>
+      <a class="dl" href="data/summary.json">
+        <span class="kind">JSON &middot; derived</span>
+        <span class="name">summary.json — every published figure</span>
+      </a>
+      <a class="dl" href="analysis/analysis.py">
+        <span class="kind">Python &middot; code</span>
+        <span class="name">analysis.py — reproduces all of it</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Joshua Croffet</strong> — data analytics portfolio project.</p>
+    <p>Source: Medical Cost Personal Datasets. Simulated data, used here for methodology
+    demonstration. Not medical, actuarial or financial advice. Every figure on this page is
+    produced by <code>analysis/analysis.py</code> from the CSV in this repository.</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="data/summary.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
